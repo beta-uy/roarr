@@ -3,6 +3,7 @@
 import {
   sprintf
 } from 'sprintf-js';
+import serializeError from 'serialize-error';
 import type {
   LoggerType,
   MessageContextType,
@@ -21,6 +22,12 @@ const logLevels = {
   trace: 10,
   warn: 40
 };
+
+const serializeIfNeeded = x => (x instanceof Error ? serializeError(x) : x);
+const serializeErrorValues = context => Object.entries(context).reduce(
+  (acc, [k, v]) => ({ ...acc, [k]: serializeIfNeeded(v) }),
+  {},
+);
 
 const createLogger = (onMessage: OnMessageEventHandlerType, parentContext: MessageContextType = {}) => {
   // eslint-disable-next-line id-length
@@ -43,7 +50,7 @@ const createLogger = (onMessage: OnMessageEventHandlerType, parentContext: Messa
 
       context = {
         ...parentContext,
-        ...a
+        ...serializeErrorValues(a)
       };
 
       message = sprintf(b, c, d, e, f, g, h, i, k);
