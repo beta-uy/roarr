@@ -73,6 +73,7 @@
     "build": "rm -fr ./dist && NODE_ENV=production babel ./src --out-dir ./dist --copy-files --source-maps && flow-copy-source src dist",
     "generate-types": "babel-node ./src/bin/generate-types.js",
     "lint": "eslint ./src ./test && flow",
+    "prepare": "npm run build",
     "test": "NODE_ENV=test ava --serial --verbose"
   },
   "version": "1.0.0"
