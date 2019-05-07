@@ -1,18 +1,14 @@
 // @flow
 
 import stringify from 'json-stringify-safe';
-import {
-  sprintf
-} from 'sprintf-js';
+import { sprintf } from 'sprintf-js';
 import type {
   LoggerType,
   MessageContextType,
   MessageType,
   TranslateMessageFunctionType
 } from '../types';
-import {
-  ROARR_LOG
-} from '../config';
+import { ROARR_LOG } from '../config';
 
 type OnMessageEventHandlerType = (message: MessageType) => void;
 
@@ -27,7 +23,10 @@ const logLevels = {
   warn: 40
 };
 
-const createLogger = (onMessage: OnMessageEventHandlerType, parentContext?: MessageContextType): LoggerType => {
+const createLogger = (
+  onMessage: OnMessageEventHandlerType,
+  parentContext?: MessageContextType
+): LoggerType => {
   // eslint-disable-next-line id-length
   const log = (a, b, c, d, e, f, g, h, i, k) => {
     if (!ROARR_LOG && !global.ROARR_LOG) {
@@ -42,7 +41,7 @@ const createLogger = (onMessage: OnMessageEventHandlerType, parentContext?: Mess
 
     if (typeof a === 'string') {
       context = {
-        ...parentContext || {}
+        ...(parentContext || {})
       };
       message = sprintf(a, b, c, d, e, f, g, h, i, k);
     } else {
@@ -50,10 +49,10 @@ const createLogger = (onMessage: OnMessageEventHandlerType, parentContext?: Mess
         throw new TypeError('Message must be a string.');
       }
 
-      context = JSON.parse(stringify({
-        ...parentContext || {},
+      context = {
+        ...(parentContext || {}),
         ...a
-      }));
+      };
 
       message = sprintf(b, c, d, e, f, g, h, i, k);
     }
@@ -69,7 +68,7 @@ const createLogger = (onMessage: OnMessageEventHandlerType, parentContext?: Mess
 
   log.child = (context: TranslateMessageFunctionType | MessageContextType): LoggerType => {
     if (typeof context === 'function') {
-      return createLogger((message) => {
+      return createLogger(message => {
         if (typeof context !== 'function') {
           throw new TypeError('Unexpected state.');
         }
@@ -85,7 +84,7 @@ const createLogger = (onMessage: OnMessageEventHandlerType, parentContext?: Mess
 
   log.getContext = (): MessageContextType => {
     return {
-      ...parentContext || {}
+      ...(parentContext || {})
     };
   };
 
